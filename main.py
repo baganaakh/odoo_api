@@ -77,7 +77,7 @@ new_stock_move_line = models.execute_kw(db, uid, password, 'stock.move.line', 'c
                                      'location_dest_id': 114,
                                      'picking_id': new_stock_picking,
                                      'state': 'draft',
-                                     }])
+                                 }])
 print('newly created stock.move.line Id is :', new_stock_move_line)
 
 new_stock_move_line2 = models.execute_kw(db, uid, password, 'stock.move.line', 'create',
