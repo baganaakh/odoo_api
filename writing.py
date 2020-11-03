@@ -8,23 +8,35 @@ password = 'work3939'
 common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(url))
 uid = common.authenticate(db, username, password, {})
 models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(url))
+# lots=models.execute_kw(db,uid,password,'dev.rfid.tag.lot.rel','get_lot_id')
 # mas = {'AAA1', 'AAA2', 'AAA3', 'AAA4', 'AAA5'}
-# # for datas in mas:
-tag_id = models.execute_kw(db, uid, password, 'dev.rfid.tag', 'search',
-                           [[['epc', '=', 'AAA2']]])
-print('tag id:', tag_id)
-lot_id = models.execute_kw(db, uid, password, 'dev.rfid.tag.lot.rel', 'search',
-                           [[['tag_id', '=', tag_id]]])
+# tag_id = models.execute_kw(db, uid, password, 'dev.rfid.tag', 'search',
+#                            [[['epc', '=', 'AAA2']]])
+# print('tag id:', tag_id)
+lot_id = models.execute_kw(
+    db
+    , uid
+    , password
+    , 'dev.rfid.tag.lot.rel', 'search_read'
+    , [
+        [
+            ['tag_id.epc', '=', 'AAA2']
+        ]
+    ]
+    , {
+        'fields': [
+            'lot_id'
+            ,'tag_id'
+        ]
+    }
+)
+
 print('lot_id: ', lot_id)
-lot = models.execute_kw(db, uid, password, 'dev.rfid.tag.lot.rel',
-                        'read', [4], {'fields': ['lot']})
-print('lot in : dev.rfid.tag.lot.rel', lot)
-dumped = json.dumps(lot)
+dumped = json.dumps(lot_id)
 loadedd = json.loads(dumped)
 
-for key in loadedd:
-    lotid=key['lot'][0]
-    lotname=key['lot'][1]
+lotid=loadedd[0]['lot_id'][0]
+lotname=loadedd[0]['lot_id'][1]
 
 new_stock_picking = models.execute_kw(db, uid, password, 'stock.picking', 'create',
                                       [{'picking_type_id': 85, 'state': 'draft',
@@ -47,7 +59,7 @@ print('newly created stock.move Id is :', new_stock_move)
 new_stock_move_line = models.execute_kw(db, uid, password, 'stock.move.line', 'create',
                                         [{
                                             'company_id': 1,
-                                            'product_id': 39,
+                                            'product_id': 40,
                                             'product_uom_qty': 22,
                                             'product_uom_id': 1,
                                             'location_id': 84,
